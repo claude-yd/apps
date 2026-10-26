@@ -9,7 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="문구 서랍">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#0f6b5f">
+<meta name="theme-color" content="#141414">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
@@ -18,10 +18,10 @@
 <style>
 /* 레이아웃: 고정 헤더(검색·분류) 아래 한 줄 카드 목록, 우하단 추가 버튼, 하단 시트로 편집 */
 :root{
-  --bg:#f3f6f5; --surface:#ffffff; --surface-2:#e7eeeb; --line:#d6e0dc;
-  --fg:#15201d; --muted:#5c6e69; --accent:#0f6b5f; --accent-fg:#ffffff;
-  --star:#b07d10; --danger:#a63d2f;
-  --shadow:0 1px 2px rgba(18,40,36,.06), 0 6px 18px rgba(18,40,36,.07);
+  --bg:#f2f2f2; --surface:#ffffff; --surface-2:#eaeaea; --line:#d4d4d4;
+  --fg:#141414; --muted:#6b6b6b; --accent:#141414; --accent-fg:#ffffff;
+  --star:#141414; --danger:#141414;
+  --shadow:0 1px 2px rgba(0,0,0,.05), 0 6px 18px rgba(0,0,0,.06);
   --ui:"IBM Plex Sans KR", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   color-scheme:light;
@@ -30,18 +30,18 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0f1514; --surface:#18211f; --surface-2:#212c2a; --line:#2b3836;
-    --fg:#e5ecea; --muted:#92a5a0; --accent:#4fd1b9; --accent-fg:#06211c;
-    --star:#dfb45a; --danger:#e58775;
-    --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.35);
+    --bg:#0c0c0c; --surface:#171717; --surface-2:#232323; --line:#343434;
+    --fg:#ededed; --muted:#9a9a9a; --accent:#ededed; --accent-fg:#111111;
+    --star:#ededed; --danger:#ededed;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 6px 18px rgba(0,0,0,.4);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0f1514; --surface:#18211f; --surface-2:#212c2a; --line:#2b3836;
-  --fg:#e5ecea; --muted:#92a5a0; --accent:#4fd1b9; --accent-fg:#06211c;
-  --star:#dfb45a; --danger:#e58775;
-  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.35);
+  --bg:#0c0c0c; --surface:#171717; --surface-2:#232323; --line:#343434;
+  --fg:#ededed; --muted:#9a9a9a; --accent:#ededed; --accent-fg:#111111;
+  --star:#ededed; --danger:#ededed;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 6px 18px rgba(0,0,0,.4);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -97,9 +97,9 @@ main{
 .row1{display:flex;align-items:center;gap:7px;min-width:0}
 .ttl{font-weight:600;font-size:14.5px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tag{flex:0 0 auto;font-size:11px;font-weight:500;color:var(--muted);background:var(--surface-2);border-radius:5px;padding:2px 6px}
-.tag.ex{color:var(--accent)}
+.tag.ex{color:var(--fg);border:1px solid var(--line)}
 .prev{font-size:13px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
-.prev var{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--accent);background:var(--surface-2);border-radius:4px;padding:0 3px}
+.prev var{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--fg);background:var(--surface-2);border:1px dashed var(--line);border-radius:4px;padding:0 3px}
 .meta{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 .side{flex:0 0 auto;display:flex;flex-direction:column;border-left:1px solid var(--line)}
 .side button{width:46px;flex:1;display:grid;place-items:center;color:var(--muted)}
@@ -120,23 +120,32 @@ main{
   right:calc(16px + env(safe-area-inset-right,0px));
   bottom:calc(18px + env(safe-area-inset-bottom,0px));
   height:52px;padding:0 20px;border-radius:999px;background:var(--accent);color:var(--accent-fg);
-  font-weight:600;font-size:15px;box-shadow:0 6px 20px rgba(15,107,95,.3);display:flex;align-items:center;gap:7px;
+  font-weight:600;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.22);display:flex;align-items:center;gap:7px;
 }
 .fab svg{width:17px;height:17px}
 
 /* ---- 시트 ---- */
-.scrim{position:fixed;inset:0;z-index:30;background:rgba(10,20,18,.45);display:flex;align-items:flex-end;justify-content:center}
-.sheet{width:100%;max-width:560px;background:var(--surface);border-radius:18px 18px 0 0;border-top:1px solid var(--line);max-height:88%;display:flex;flex-direction:column;box-shadow:0 -10px 40px rgba(0,0,0,.25)}
+.scrim{
+  position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+}
+.sheet{
+  width:100%;max-width:560px;background:var(--surface);border:1px solid var(--line);
+  border-radius:18px;max-height:100%;display:flex;flex-direction:column;
+  box-shadow:0 18px 50px rgba(0,0,0,.32);
+}
 .sheet-h{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid var(--line)}
 .sheet-h h2{margin:0;font-size:15px;font-weight:700}
 .sheet-b{overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:13px;-webkit-overflow-scrolling:touch}
-.sheet-f{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line);padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+.sheet-f{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-size:12px;font-weight:600;letter-spacing:.02em;color:var(--muted)}
 .field input,.field textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);-webkit-appearance:none}
-.field textarea{min-height:130px;resize:vertical;line-height:1.6}
+.field textarea{min-height:clamp(160px,34vh,400px);resize:vertical;line-height:1.7}
+#bkData{min-height:clamp(140px,22vh,260px)}
 .varhint{margin:0;font-size:11.5px;color:var(--muted)}
-.varhint code{font-family:var(--mono);font-size:11px;background:var(--surface-2);border-radius:4px;padding:1px 4px;color:var(--accent)}
+.varhint code{font-family:var(--mono);font-size:11px;background:var(--surface-2);border:1px dashed var(--line);border-radius:4px;padding:1px 4px;color:var(--fg)}
 .btn{flex:1;height:46px;border-radius:12px;font-weight:600;display:grid;place-items:center}
 .btn.primary{background:var(--accent);color:var(--accent-fg)}
 .btn.ghost{background:var(--surface-2);color:var(--fg)}
@@ -145,6 +154,9 @@ main{
 .x{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--muted);font-size:19px;line-height:1}
 #bkData{min-height:150px;font-family:var(--mono);font-size:11.5px;line-height:1.45}
 .bk-note{margin:0;font-size:12px;color:var(--muted);line-height:1.6}
+.bk-note b{color:var(--fg);font-weight:600}
+.bk-note code{font-family:var(--mono);font-size:11px;background:var(--surface-2);border-radius:4px;padding:1px 4px;color:var(--fg)}
+.tag.loc{color:var(--star)}
 
 /* ---- 토스트 ---- */
 .toast{
@@ -183,8 +195,8 @@ main{
     <button id="sortNew" aria-pressed="false">최근 수정순</button>
   </div>
   <div class="list" id="list"></div>
-  <p class="hint">탭하면 바로 복사됩니다. 카톡·문자 입력창에서 길게 눌러 붙여넣으세요.<br>
-  문구는 이 아이폰 안에만 저장됩니다. 가끔 <b>백업</b>을 눌러 내용을 따로 보관해 두세요.</p>
+  <p class="hint">탭하면 바로 복사됩니다. 카톡·문자·메일 어디든 붙여넣으세요.<br>
+  전체 내용은 <b>연필</b>을 눌러 편집 창에서 볼 수 있습니다. 문구는 이 기기 안에만 저장되니, 가끔 <b>백업</b>해 두시면 좋습니다.</p>
 </main>
 
 <button class="fab" id="add">
@@ -219,7 +231,7 @@ main{
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="bkTitle">
     <div class="sheet-h"><h2 id="bkTitle">백업과 복원</h2><button class="x" id="bkClose" aria-label="닫기">✕</button></div>
     <div class="sheet-b">
-      <p class="bk-note">아래 내용이 지금 저장된 문구 전체입니다. 복사해서 메모나 메일에 보관해 두세요. 새 기기로 옮길 때는 이 칸에 보관해 둔 내용을 붙여넣고 <b>복원</b>을 누르면 됩니다.</p>
+      <p class="bk-note">아래 내용이 지금 저장된 문구 전체입니다. 복사해서 메일이나 메모에 보관해 두세요. 다른 기기로 옮기거나 되살릴 때는 이 칸에 보관해 둔 내용을 붙여넣고 <b>복원</b>을 누르면 됩니다.</p>
       <div class="field"><label for="bkData">백업 내용</label><textarea id="bkData" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea></div>
       <p class="bk-note" id="bkMsg"></p>
     </div>
@@ -424,8 +436,9 @@ main{
     if(!raw){ toast("복원할 내용이 없습니다"); return; }
     var v;
     try{ v = JSON.parse(raw); }catch(e){ toast("내용 형식이 올바르지 않습니다"); return; }
-    if(!Array.isArray(v)){ toast("내용 형식이 올바르지 않습니다"); return; }
-    var clean = v.filter(function(s){ return s && typeof s.body === "string"; }).map(function(s){
+    var arr = Array.isArray(v) ? v : (v && Array.isArray(v.items) ? v.items : null);
+    if(!arr){ toast("내용 형식이 올바르지 않습니다"); return; }
+    var clean = arr.filter(function(s){ return s && typeof s.body === "string"; }).map(function(s){
       return {id:String(s.id||newId()), title:String(s.title||""), body:String(s.body||""),
               cat:String(s.cat||""), fav:!!s.fav, uses:Number(s.uses)||0, lastUsed:Number(s.lastUsed)||0,
               created:Number(s.created)||Date.now(), updated:Number(s.updated)||Date.now(), sample:!!s.sample};
