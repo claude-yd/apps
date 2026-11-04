@@ -1,0 +1,574 @@
+<title>To-do list</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap">
+<style>
+/* Layout: 단일 세로 칼럼(최대 660px) — 상단 입력부, 아래로 진행중 목록 → 완료 목록 */
+:root{
+  --bg:#f3f4f7;
+  --surface:#ffffff;
+  --surface-2:#eceef3;
+  --ink:#191d26;
+  --muted:#6a7183;
+  --line:#dfe3ea;
+  --accent:#3e4b86;
+  --accent-soft:#e6e9f6;
+  --pri-high:#b0443c;
+  --pri-mid:#937228;
+  --pri-low:#4f7b68;
+  --danger:#b0443c;
+  --font-display:"Gowun Batang",'Nanum Myeongjo',serif;
+  --font-body:"IBM Plex Sans KR",'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14161b;
+    --surface:#1c1f26;
+    --surface-2:#232732;
+    --ink:#e7e9ee;
+    --muted:#979eae;
+    --line:#2d323d;
+    --accent:#97a7e6;
+    --accent-soft:#272c40;
+    --pri-high:#e08478;
+    --pri-mid:#d6b063;
+    --pri-low:#85b69e;
+    --danger:#e08478;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14161b;
+  --surface:#1c1f26;
+  --surface-2:#232732;
+  --ink:#e7e9ee;
+  --muted:#979eae;
+  --line:#2d323d;
+  --accent:#97a7e6;
+  --accent-soft:#272c40;
+  --pri-high:#e08478;
+  --pri-mid:#d6b063;
+  --pri-low:#85b69e;
+  --danger:#e08478;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-weight:400;
+  font-size:15px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{
+  max-width:660px;
+  margin:0 auto;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:28px 56px;
+}
+
+/* ── 헤더 ── */
+header{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--line);
+}
+h1{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:26px;
+  letter-spacing:-.01em;
+  margin:0;
+  text-wrap:balance;
+}
+.tally{
+  font-size:12.5px;
+  color:var(--muted);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.01em;
+}
+.tally b{color:var(--ink);font-weight:600}
+
+/* ── 입력부 ── */
+form.compose{
+  margin-top:18px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.compose input[type="text"]{
+  width:100%;
+  border:0;
+  border-bottom:1.5px solid var(--line);
+  background:transparent;
+  color:var(--ink);
+  font-family:inherit;
+  font-size:16px;
+  padding:4px 2px 8px;
+  outline:none;
+  transition:border-color .15s;
+}
+.compose input[type="text"]::placeholder{color:var(--muted)}
+.compose input[type="text"]:focus{border-bottom-color:var(--accent)}
+.row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+fieldset.pri{
+  border:0;margin:0;padding:0;
+  display:flex;
+  gap:0;
+  border:1px solid var(--line);
+  border-radius:7px;
+  overflow:hidden;
+  min-width:0;
+}
+fieldset.pri legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.pri label{
+  position:relative;
+  font-size:12.5px;
+  padding:6px 12px;
+  cursor:pointer;
+  color:var(--muted);
+  border-right:1px solid var(--line);
+  user-select:none;
+  transition:background .15s,color .15s;
+}
+.pri label:last-of-type{border-right:0}
+.pri input{position:absolute;opacity:0;width:1px;height:1px}
+.pri input:checked + span{color:var(--surface)}
+.pri label:has(input:checked){background:var(--accent);color:var(--surface)}
+.pri label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:1px}
+:root[data-theme="dark"] .pri label:has(input:checked),
+.pri label:has(input:checked){color:#fff}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .pri label:has(input:checked){color:#14161b}
+}
+:root[data-theme="dark"] .pri label:has(input:checked){color:#14161b}
+
+input[type="date"]{
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:var(--surface);
+  color:var(--ink);
+  font-family:inherit;
+  font-size:12.5px;
+  padding:5px 8px;
+  outline:none;
+  min-width:0;
+}
+input[type="date"]:focus{border-color:var(--accent)}
+button{
+  font-family:inherit;
+  cursor:pointer;
+  border-radius:7px;
+  transition:background .15s,border-color .15s,color .15s,opacity .15s;
+}
+.add{
+  margin-left:auto;
+  background:var(--accent);
+  color:#fff;
+  border:1px solid var(--accent);
+  font-size:13.5px;
+  font-weight:500;
+  padding:7px 20px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .add{color:#14161b}
+}
+:root[data-theme="dark"] .add{color:#14161b}
+.add:hover{opacity:.88}
+.hint{font-size:11.5px;color:var(--muted)}
+
+/* ── 목록 ── */
+.section-label{
+  display:flex;align-items:center;gap:10px;
+  margin:26px 0 10px;
+  font-size:11.5px;
+  letter-spacing:.09em;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+.section-label::after{content:"";flex:1;height:1px;background:var(--line)}
+ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+
+li.item{
+  display:flex;
+  align-items:flex-start;
+  gap:11px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-left:3px solid var(--stripe,var(--line));
+  border-radius:8px;
+  padding:11px 12px;
+}
+li.item.done{background:transparent;border-color:var(--line);border-left-color:var(--line)}
+
+.check{
+  flex:none;
+  width:19px;height:19px;
+  margin-top:2px;
+  border:1.5px solid var(--muted);
+  border-radius:5px;
+  background:transparent;
+  padding:0;
+  display:grid;place-items:center;
+}
+.check:hover{border-color:var(--accent)}
+.check svg{width:11px;height:11px;opacity:0;transition:opacity .12s}
+li.done .check{background:var(--muted);border-color:var(--muted)}
+li.done .check svg{opacity:1}
+
+.body{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.text{
+  word-break:break-word;
+  font-size:15px;
+  line-height:1.45;
+}
+li.done .text{
+  text-decoration:line-through;
+  text-decoration-thickness:1.5px;
+  text-decoration-color:var(--muted);
+  color:var(--muted);
+}
+.meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11.5px}
+.chip{
+  display:inline-flex;align-items:center;gap:4px;
+  color:var(--chip,var(--muted));
+  letter-spacing:.02em;
+}
+.chip .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+.due{color:var(--muted);font-variant-numeric:tabular-nums}
+.due.soon{color:var(--pri-mid)}
+.due.over{color:var(--danger);font-weight:500}
+li.done .meta{opacity:.55}
+
+.acts{display:flex;gap:2px;flex:none}
+.acts button{
+  background:transparent;border:1px solid transparent;color:var(--muted);
+  font-size:11.5px;padding:3px 7px;
+}
+.acts button:hover{background:var(--surface-2);color:var(--ink)}
+.acts button.del:hover{color:var(--danger)}
+
+.edit-input{
+  width:100%;border:1px solid var(--accent);border-radius:6px;
+  background:var(--surface);color:var(--ink);font-family:inherit;font-size:15px;
+  padding:5px 7px;outline:none;
+}
+
+.empty{
+  border:1px dashed var(--line);
+  border-radius:9px;
+  padding:26px 18px;
+  text-align:center;
+  color:var(--muted);
+  font-size:13.5px;
+}
+.empty strong{display:block;color:var(--ink);font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:5px}
+
+footer{
+  margin-top:30px;padding-top:14px;border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  font-size:11.5px;color:var(--muted);
+}
+footer button{
+  background:transparent;border:1px solid var(--line);color:var(--muted);
+  font-size:11.5px;padding:4px 10px;
+}
+footer button:hover{border-color:var(--danger);color:var(--danger)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:420px){
+  .add{margin-left:0;width:100%}
+  .row{gap:8px}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>To-do list</h1>
+    <div class="tally" id="tally"></div>
+  </header>
+
+  <form class="compose" id="compose" autocomplete="off">
+    <input type="text" id="new-text" placeholder="할 일을 적으세요" maxlength="200" aria-label="할 일 내용">
+    <div class="row">
+      <fieldset class="pri">
+        <legend>중요도</legend>
+        <label><input type="radio" name="pri" value="3"><span>높음</span></label>
+        <label><input type="radio" name="pri" value="2" checked><span>보통</span></label>
+        <label><input type="radio" name="pri" value="1"><span>낮음</span></label>
+      </fieldset>
+      <input type="date" id="new-due" aria-label="기한 (선택)">
+      <button type="submit" class="add">추가</button>
+    </div>
+    <div class="hint">기한은 비워 두어도 됩니다. Enter로 바로 추가됩니다.</div>
+  </form>
+
+  <div id="list-area"></div>
+
+  <footer>
+    <span id="store-note"></span>
+    <button type="button" id="clear-done">완료 항목 비우기</button>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var KEY = 'halil-seorap-v1';
+  var PRI = {3:{label:'높음',color:'var(--pri-high)'},2:{label:'보통',color:'var(--pri-mid)'},1:{label:'낮음',color:'var(--pri-low)'}};
+  var items = [];
+  var editingId = null;
+  var storageOk = true;
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){ items = JSON.parse(raw) || []; return true; }
+    }catch(e){ storageOk = false; }
+    return false;
+  }
+  function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify(items)); }
+    catch(e){ storageOk = false; renderNote(); }
+  }
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+  function seed(){
+    var d = new Date(); d.setDate(d.getDate()+2);
+    var iso = d.toISOString().slice(0,10);
+    items = [
+      {id:uid(), text:'(예시) 주간 업무보고 초안 정리', pri:3, due:iso, done:false, createdAt:Date.now()},
+      {id:uid(), text:'(예시) 협업기관 회신 메일 확인', pri:2, due:null, done:false, createdAt:Date.now()+1},
+      {id:uid(), text:'(예시) 자료실 파일 정리', pri:1, due:null, done:true, doneAt:Date.now(), createdAt:Date.now()+2}
+    ];
+  }
+
+  function todayStart(){ var t = new Date(); t.setHours(0,0,0,0); return t; }
+  function dueInfo(iso){
+    if(!iso) return null;
+    var p = iso.split('-');
+    var d = new Date(+p[0], +p[1]-1, +p[2]);
+    var diff = Math.round((d - todayStart()) / 86400000);
+    var label;
+    if(diff === 0) label = '오늘까지';
+    else if(diff === 1) label = '내일까지';
+    else if(diff > 0) label = 'D-' + diff;
+    else label = (-diff) + '일 지남';
+    var cls = diff < 0 ? 'over' : (diff <= 2 ? 'soon' : '');
+    return {label: (+p[1]) + '/' + (+p[2]) + ' · ' + label, cls: cls};
+  }
+
+  function sorted(){
+    var active = items.filter(function(i){ return !i.done; }).sort(function(a,b){
+      if(b.pri !== a.pri) return b.pri - a.pri;
+      if(a.due && b.due && a.due !== b.due) return a.due < b.due ? -1 : 1;
+      if(a.due && !b.due) return -1;
+      if(!a.due && b.due) return 1;
+      return a.createdAt - b.createdAt;
+    });
+    var done = items.filter(function(i){ return i.done; }).sort(function(a,b){
+      return (b.doneAt||0) - (a.doneAt||0);
+    });
+    return {active:active, done:done};
+  }
+
+  var area = document.getElementById('list-area');
+
+  function snapshot(){
+    var map = {};
+    area.querySelectorAll('li.item').forEach(function(el){
+      map[el.dataset.id] = el.getBoundingClientRect().top;
+    });
+    return map;
+  }
+  function flip(before){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    area.querySelectorAll('li.item').forEach(function(el){
+      var prev = before[el.dataset.id];
+      if(prev === undefined) return;
+      var delta = prev - el.getBoundingClientRect().top;
+      if(!delta) return;
+      el.animate(
+        [{transform:'translateY(' + delta + 'px)'},{transform:'translateY(0)'}],
+        {duration:260, easing:'cubic-bezier(.2,.7,.3,1)'}
+      );
+    });
+  }
+
+  function makeItem(it){
+    var li = document.createElement('li');
+    li.className = 'item' + (it.done ? ' done' : '');
+    li.dataset.id = it.id;
+    if(!it.done) li.style.setProperty('--stripe', PRI[it.pri].color);
+
+    var cb = document.createElement('button');
+    cb.type = 'button'; cb.className = 'check';
+    cb.setAttribute('aria-pressed', it.done ? 'true' : 'false');
+    cb.setAttribute('aria-label', it.done ? '완료 해제' : '완료 표시');
+    cb.innerHTML = '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1.5 6.3 4.4 9.2 10.5 3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    cb.addEventListener('click', function(){ toggle(it.id); });
+    li.appendChild(cb);
+
+    var body = document.createElement('div');
+    body.className = 'body';
+
+    if(editingId === it.id){
+      var inp = document.createElement('input');
+      inp.type = 'text'; inp.className = 'edit-input'; inp.value = it.text; inp.maxLength = 200;
+      inp.addEventListener('keydown', function(e){
+        if(e.key === 'Enter'){ commitEdit(it.id, inp.value); }
+        else if(e.key === 'Escape'){ editingId = null; render(); }
+      });
+      inp.addEventListener('blur', function(){ commitEdit(it.id, inp.value); });
+      body.appendChild(inp);
+      setTimeout(function(){ inp.focus(); inp.select(); }, 0);
+    } else {
+      var txt = document.createElement('div');
+      txt.className = 'text';
+      txt.textContent = it.text;
+      body.appendChild(txt);
+    }
+
+    var meta = document.createElement('div');
+    meta.className = 'meta';
+    var chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.style.setProperty('--chip', PRI[it.pri].color);
+    chip.innerHTML = '<span class="dot"></span>';
+    chip.appendChild(document.createTextNode(PRI[it.pri].label));
+    meta.appendChild(chip);
+    var di = dueInfo(it.due);
+    if(di){
+      var due = document.createElement('span');
+      due.className = 'due ' + (it.done ? '' : di.cls);
+      due.textContent = di.label;
+      meta.appendChild(due);
+    }
+    body.appendChild(meta);
+    li.appendChild(body);
+
+    var acts = document.createElement('div');
+    acts.className = 'acts';
+    if(!it.done && editingId !== it.id){
+      var ed = document.createElement('button');
+      ed.type = 'button'; ed.textContent = '수정';
+      ed.addEventListener('click', function(){ editingId = it.id; render(); });
+      acts.appendChild(ed);
+    }
+    var del = document.createElement('button');
+    del.type = 'button'; del.className = 'del'; del.textContent = '삭제';
+    del.addEventListener('click', function(){ remove(it.id); });
+    acts.appendChild(del);
+    li.appendChild(acts);
+
+    return li;
+  }
+
+  function render(){
+    var before = snapshot();
+    var s = sorted();
+    area.textContent = '';
+
+    if(s.active.length === 0 && s.done.length === 0){
+      var e = document.createElement('div');
+      e.className = 'empty';
+      e.innerHTML = '<strong>목록이 비었습니다</strong>위에 할 일을 적고 추가하세요.';
+      area.appendChild(e);
+    }
+
+    if(s.active.length){
+      var l1 = document.createElement('div');
+      l1.className = 'section-label';
+      l1.textContent = '진행 중';
+      area.appendChild(l1);
+      var ul1 = document.createElement('ul');
+      s.active.forEach(function(it){ ul1.appendChild(makeItem(it)); });
+      area.appendChild(ul1);
+    } else if(s.done.length){
+      var e2 = document.createElement('div');
+      e2.className = 'empty';
+      e2.innerHTML = '<strong>남은 일이 없습니다</strong>오늘 할 일을 모두 끝냈습니다.';
+      area.appendChild(e2);
+    }
+
+    if(s.done.length){
+      var l2 = document.createElement('div');
+      l2.className = 'section-label';
+      l2.textContent = '완료 ' + s.done.length;
+      area.appendChild(l2);
+      var ul2 = document.createElement('ul');
+      s.done.forEach(function(it){ ul2.appendChild(makeItem(it)); });
+      area.appendChild(ul2);
+    }
+
+    document.getElementById('tally').innerHTML =
+      '남은 일 <b>' + s.active.length + '</b> · 완료 <b>' + s.done.length + '</b>';
+    document.getElementById('clear-done').hidden = s.done.length === 0;
+    renderNote();
+    flip(before);
+  }
+
+  function renderNote(){
+    document.getElementById('store-note').textContent =
+      storageOk ? '이 브라우저에만 저장됩니다.' : '저장이 차단되어 새로고침하면 사라집니다.';
+  }
+
+  function toggle(id){
+    items.forEach(function(i){
+      if(i.id === id){
+        i.done = !i.done;
+        i.doneAt = i.done ? Date.now() : null;
+      }
+    });
+    editingId = null; save(); render();
+  }
+  function remove(id){
+    items = items.filter(function(i){ return i.id !== id; });
+    editingId = null; save(); render();
+  }
+  function commitEdit(id, value){
+    if(editingId !== id) return;
+    var v = value.trim();
+    editingId = null;
+    if(v) items.forEach(function(i){ if(i.id === id) i.text = v; });
+    save(); render();
+  }
+
+  document.getElementById('compose').addEventListener('submit', function(e){
+    e.preventDefault();
+    var t = document.getElementById('new-text');
+    var d = document.getElementById('new-due');
+    var v = t.value.trim();
+    if(!v){ t.focus(); return; }
+    var pri = +document.querySelector('input[name="pri"]:checked').value;
+    items.push({id:uid(), text:v, pri:pri, due:d.value || null, done:false, createdAt:Date.now()});
+    t.value = ''; d.value = '';
+    save(); render(); t.focus();
+  });
+
+  document.getElementById('clear-done').addEventListener('click', function(){
+    items = items.filter(function(i){ return !i.done; });
+    save(); render();
+  });
+
+  if(!load()) seed();
+  render();
+})();
+</script>
